@@ -2,7 +2,6 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Display
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,7 +12,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 import androidx.compose.foundation.layout.Column
@@ -72,7 +70,7 @@ fun Main(postScaffoldPadding: PaddingValues, runRoutes: List<String>, bikeRoutes
             EkranBiegowe(navController = navController, postScaffoldPadding, runRoutes, categoriesList)
         }
         composable("Rowerowe") {
-            EkranRowerowe(navController = navController, postScaffoldPadding, bikeRoutes, categoriesList)
+            EranRowerowe(navController = navController, postScaffoldPadding, bikeRoutes, categoriesList)
         }
     }
 }
@@ -88,7 +86,7 @@ fun EkranBiegowe(navController: NavController, postScaffoldPadding: PaddingValue
 }
 
 @Composable
-fun EkranRowerowe(navController: NavController, postScaffoldPadding: PaddingValues, bikeRoutes: List<String>, categoriesList: List<String>) {
+fun EranRowerowe(navController: NavController, postScaffoldPadding: PaddingValues, bikeRoutes: List<String>, categoriesList: List<String>) {
     Column(modifier = Modifier.padding(postScaffoldPadding)) {
         DisplayCategories(navController = navController, categoriesList, 1, Modifier.fillMaxWidth().padding(4.dp))
         DisplayNamesList(
