@@ -15,21 +15,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Icon
+import com.example.myapplication.data.RouteRepository
+import com.example.myapplication.data.Route
 
 class DetailsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val routeName = intent.getStringExtra("routeName") ?: "NameNotProvided"
-        val routeDescription = RouteRepository.details[routeName] ?: "DescriptionNotFound"
+        val routeID = intent.getStringExtra("routeID") ?: "IDNotProvided"
+        val route: Route = RouteRepository.getRouteById(routeID)
 
         enableEdgeToEdge()
         setContent {
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text("Detale trasy $routeName") },
+                        title = { Text("Details of ${route.name}") },
                         navigationIcon = {
                             IconButton(onClick = { finish() }){
                                 Icon(
@@ -42,7 +44,7 @@ class DetailsActivity : ComponentActivity() {
                 }
             ){ postScaffoldPadding ->
                 Column(modifier = Modifier.padding(postScaffoldPadding)){
-                    Text(text = routeDescription)
+                    Text("Typ: ${route.type}\nLength: ${route.length}\nDifficulty: ${route.difficulty}\nAdditional info: ${route.additionalInfo}")
                 }
             }
 

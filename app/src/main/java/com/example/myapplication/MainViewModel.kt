@@ -1,28 +1,30 @@
 package com.example.myapplication
 
+import com.example.myapplication.data.RouteRepository
+
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
 
+    private val runRoutes = RouteRepository.getRoutesByType("Biker")
+    private val bikeRoutes = RouteRepository.getRoutesByType("Runner")
 
-    val runRoutes = RouteRepository.runRoutesNames
-    val bikeRoutes = RouteRepository.bikeRoutesNames
-
-    var displayedNamesList = mutableStateOf(runRoutes)
+    val categories = RouteRepository.getRoutesCategories()
+    var displayedRoutesList = mutableStateOf(bikeRoutes)
         private set
-    var selectedCategory = mutableStateOf("Biegowe")
+    var selectedCategory = mutableStateOf("Biker")
         private set
 
     fun updateCategory(category: String) {
         when (category) {
-            "Biegowe" -> {
-                displayedNamesList.value = runRoutes
-                selectedCategory.value = "Biegowe"
+            "Runner" -> {
+                displayedRoutesList.value = runRoutes
+                selectedCategory.value = "Runner"
             }
-            "Rowerowe" -> {
-                displayedNamesList.value = bikeRoutes
-                selectedCategory.value = "Rowerowe"
+            "Biker" -> {
+                displayedRoutesList.value = bikeRoutes
+                selectedCategory.value = "Biker"
             }
             else -> {
                 throw IllegalArgumentException("Invalid route type: $category")

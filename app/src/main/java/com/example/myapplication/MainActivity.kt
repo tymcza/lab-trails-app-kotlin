@@ -16,7 +16,6 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.unit.dp
-import kotlin.collections.List
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,8 +34,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
 
-    val categoriesList = listOf("Biegowe", "Rowerowe")
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -46,12 +43,12 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            title = { Text("Lista tras") }
+                            title = { Text("Routes list") }
                         )
                     }
                 ) { postScaffoldPadding ->
                     Column(Modifier.padding(postScaffoldPadding)) {
-                        DisplayCategories(categoriesList, viewModel = viewModel, Modifier.fillMaxWidth().padding(4.dp))
+                        DisplayCategories(viewModel = viewModel, Modifier.fillMaxWidth().padding(4.dp))
                         DisplayNamesList(viewModel)
                     }
                 }
@@ -61,8 +58,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun DisplayCategories(categoriesList: List<String>, viewModel: MainViewModel, modifier: Modifier = Modifier){
-
+fun DisplayCategories(viewModel: MainViewModel, modifier: Modifier = Modifier){
+    val categoriesList = viewModel.categories
     val selectedCategory = viewModel.selectedCategory.value
 
     Row(
@@ -95,7 +92,7 @@ fun DisplayCategories(categoriesList: List<String>, viewModel: MainViewModel, mo
 @Composable
 fun DisplayNamesList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
-    val routesList = viewModel.displayedNamesList.value
+    val routesList = viewModel.displayedRoutesList.value
     val context = LocalContext.current
 
     LazyColumn(
@@ -104,18 +101,18 @@ fun DisplayNamesList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
         items(routesList){
-            name ->
+            route ->
             Button(
                 onClick = {
                     val intent = Intent(context, DetailsActivity::class.java).apply {
-                        putExtra("routeName", name)
+                        putExtra("routeID", route.id)
                     }
                     context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(Color.DarkGray)
             ) {
                 Text(
-                    text = name
+                    text = route.name
                 )
             }
         }
