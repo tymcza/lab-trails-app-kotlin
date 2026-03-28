@@ -28,24 +28,20 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.platform.LocalContext
-
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
-    val runRoutes = RouteRepository.runRoutesNames
-    val bikeRoutes = RouteRepository.bikeRoutesNames
+
     val categoriesList = listOf("Biegowe", "Rowerowe")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val viewModel : MainViewModel = viewModel()
             MyApplicationTheme {
                 Scaffold(
                     topBar = {
@@ -54,55 +50,27 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 ) { postScaffoldPadding ->
-                    Main(postScaffoldPadding, runRoutes, bikeRoutes, categoriesList)
+                    Column(Modifier.padding(postScaffoldPadding)) {
+                        DisplayCategories(categoriesList, viewModel = viewModel, Modifier.fillMaxWidth().padding(4.dp))
+                        DisplayNamesList(viewModel)
+                    }
                 }
             }
         }
     }
 }
 
-
 @Composable
-fun Main(postScaffoldPadding: PaddingValues, runRoutes: List<String>, bikeRoutes: List<String>, categoriesList: List<String>){
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "Biegowe"){
-        composable("Biegowe") {
-            EkranBiegowe(navController = navController, postScaffoldPadding, runRoutes, categoriesList)
-        }
-        composable("Rowerowe") {
-            EranRowerowe(navController = navController, postScaffoldPadding, bikeRoutes, categoriesList)
-        }
-    }
-}
+fun DisplayCategories(categoriesList: List<String>, viewModel: MainViewModel, modifier: Modifier = Modifier){
 
-@Composable
-fun EkranBiegowe(navController: NavController, postScaffoldPadding: PaddingValues, runList: List<String>, categoriesList: List<String>){
-    Column(modifier = Modifier.padding(postScaffoldPadding)) {
-        DisplayCategories(navController = navController, categoriesList, 0, Modifier.fillMaxWidth().padding(4.dp))
-        DisplayNamesList(
-            runList
-        )
-    }
-}
+    val selectedCategory = viewModel.selectedCategory.value
 
-@Composable
-fun EranRowerowe(navController: NavController, postScaffoldPadding: PaddingValues, bikeRoutes: List<String>, categoriesList: List<String>) {
-    Column(modifier = Modifier.padding(postScaffoldPadding)) {
-        DisplayCategories(navController = navController, categoriesList, 1, Modifier.fillMaxWidth().padding(4.dp))
-        DisplayNamesList(
-            bikeRoutes
-        )
-    }
-}
-
-@Composable
-fun DisplayCategories(navController: NavController, categoriesList: List<String>, selected: Int, modifier: Modifier = Modifier){
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        categoriesList.forEachIndexed { index, name ->
-            if (index == selected) {
+        categoriesList.forEach { name ->
+            if (name == selectedCategory) {
                 OutlinedButton(
                     onClick = {},
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
@@ -110,10 +78,11 @@ fun DisplayCategories(navController: NavController, categoriesList: List<String>
                 ) {
                     Text(text = name)
                 }
-
             } else {
                 Button(
-                    onClick = {navController.navigate(name)},
+                    onClick = {
+                        viewModel.updateCategory(name)
+                              },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
                 ) {
                     Text(text = name)
@@ -124,8 +93,9 @@ fun DisplayCategories(navController: NavController, categoriesList: List<String>
 }
 
 @Composable
-fun DisplayNamesList(names: List<String>, modifier: Modifier = Modifier) {
+fun DisplayNamesList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
+    val routesList = viewModel.displayedNamesList.value
     val context = LocalContext.current
 
     LazyColumn(
@@ -133,14 +103,13 @@ fun DisplayNamesList(names: List<String>, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
-        items(names){
+        items(routesList){
             name ->
             Button(
                 onClick = {
                     val intent = Intent(context, DetailsActivity::class.java).apply {
                         putExtra("routeName", name)
                     }
-
                     context.startActivity(intent)
                 },
                 colors = ButtonDefaults.buttonColors(Color.DarkGray)
