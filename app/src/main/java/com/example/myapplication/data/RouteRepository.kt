@@ -1,10 +1,10 @@
 package com.example.myapplication.data
 
-object RouteRepository {
-    val nullRoute = Route("err", "ThisIsANullRoute", "Null", "Null", "Null", "Null")
+import com.example.myapplication.data.entities.Route
 
-    val allRoutes = listOf(
-        Route("b1", "Neighbourhood", "Biker", "4km", "Low", "Around the neighbourhood."),
+object RouteRepository {
+    val staticRoutes = listOf(
+        Route("b1", "Papa", "Biker", "4km", "Low", "Around the neighborhood."),
         Route("b2", "Run Forest", "Biker", "8km", "Intermediate", "And he ran through the forest."),
         Route("b3", "Warta", "Biker", "12km", "High", "Long, asphalt, nice open space."),
 
@@ -12,17 +12,4 @@ object RouteRepository {
         Route("r2", "Off road", "Runner", "60m", "Intermediate", "Better go with an MTB bike."),
         Route("r3", "City around", "Runner", "120km", "High", "Long, beautiful. Quite an accomplishment.")
     )
-
-    fun getRoutesByType(type: String): List<Route> {
-        return allRoutes.filter { it.type == type }
-    }
-
-    fun getRouteById(id: String): Route {
-        return allRoutes.find { it.id == id } ?: nullRoute
-    }
-
-    fun getRoutesCategories(): List<String> {
-        return allRoutes.map { it.type }.distinct().sorted()
-    }
-
 }
