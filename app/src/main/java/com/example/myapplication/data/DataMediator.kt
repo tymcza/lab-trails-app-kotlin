@@ -13,11 +13,6 @@ class DataMediator(private val dao: RoutesDao){
     private var databaseInit = false
     private var databaseRoutes: List<Route> = listOf()
 
-    //get rid of nullRoute -> exception mechanism
-    val nullRoute = Route("err", "ThisIsANullRoute", "Null", "Null", "Null", "Null")
-
-
-
     private val mediatorScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     fun initializeDataBase() {
         mediatorScope.launch {
@@ -39,8 +34,8 @@ class DataMediator(private val dao: RoutesDao){
         return allRoutes.filter { it.type == type }
     }
 
-    fun getRouteById(id: String): Route {
-        return allRoutes.find { it.id == id } ?: nullRoute
+    fun getRouteById(id: String): Route? {
+        return allRoutes.find { it.id == id }
     }
 
     fun getRoutesCategories(): List<String> {
