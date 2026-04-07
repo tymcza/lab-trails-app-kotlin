@@ -2,8 +2,6 @@ package com.example.myapplication.data
 
 import androidx.room.*
 import com.example.myapplication.data.entities.*
-import kotlinx.coroutines.flow.Flow
-
 
 @Dao
 interface RoutesDao {
