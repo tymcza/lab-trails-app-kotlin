@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -15,8 +16,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Icon
-import com.example.myapplication.data.RouteRepository
-import com.example.myapplication.data.Route
+import com.example.myapplication.data.entities.Route
+import com.example.myapplication.logic.DetailsViewModel
+import com.example.myapplication.logic.DetailsViewModelFactory
 
 class DetailsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -24,10 +26,12 @@ class DetailsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val routeID = intent.getStringExtra("routeID") ?: "IDNotProvided"
-        val route: Route = RouteRepository.getRouteById(routeID)
+        val mediator = (application as MyApp).dataMediator
+        val viewModel: DetailsViewModel by viewModels { DetailsViewModelFactory(mediator, routeID) }
 
         enableEdgeToEdge()
         setContent {
+            val route: Route = viewModel.route.value
             Scaffold(
                 topBar = {
                     TopAppBar(
