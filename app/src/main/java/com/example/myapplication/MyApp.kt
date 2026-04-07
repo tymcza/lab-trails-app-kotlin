@@ -15,8 +15,4 @@ class MyApp : Application() {
             initializeDataBase()
         }
     }
-
-    override fun onCreate() {
-        super.onCreate()
-    }
 }
