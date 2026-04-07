@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 
 class DataMediator(private val dao: RoutesDao){
 
+    @Volatile
     private var databaseInit = false
     private var databaseRoutes: List<Route> = listOf()
     val nullRoute = Route("err", "ThisIsANullRoute", "Null", "Null", "Null", "Null")
