@@ -12,6 +12,8 @@ class DataMediator(private val dao: RoutesDao){
     @Volatile
     private var databaseInit = false
     private var databaseRoutes: List<Route> = listOf()
+
+    //get rid of nullRoute -> exception mechanism
     val nullRoute = Route("err", "ThisIsANullRoute", "Null", "Null", "Null", "Null")
 
 
