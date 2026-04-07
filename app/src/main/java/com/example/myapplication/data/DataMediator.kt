@@ -29,7 +29,6 @@ class DataMediator(private val dao: RoutesDao){
     val allRoutes: List<Route>
         get() = if (databaseInit && databaseRoutes.isNotEmpty()) databaseRoutes else staticRoutes
 
-
     fun getRoutesByType(type: String): List<Route> {
         return allRoutes.filter { it.type == type }
     }
@@ -41,5 +40,4 @@ class DataMediator(private val dao: RoutesDao){
     fun getRoutesCategories(): List<String> {
         return allRoutes.map { it.type }.distinct().sorted()
     }
-
 }
