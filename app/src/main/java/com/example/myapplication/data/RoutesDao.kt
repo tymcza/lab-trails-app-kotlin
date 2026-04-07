@@ -12,7 +12,7 @@ interface RoutesDao {
     suspend fun getRoutesByType(routeType: String): List<Route>
 
     @Query("SELECT * FROM routes_catalogue WHERE ID = :routeID")
-    suspend fun getRouteByID(routeID: String): Route
+    suspend fun getRouteByID(routeID: String): Route?
 
     @Query("SELECT type_name FROM route_types ORDER BY type_name ASC")
     suspend fun getRoutesCategories(): List<String>
