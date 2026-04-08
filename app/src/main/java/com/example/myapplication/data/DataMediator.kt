@@ -1,7 +1,7 @@
 package com.example.myapplication.data
 
 import com.example.myapplication.data.RouteRepository.staticRoutes
-import com.example.myapplication.data.entities.Route
+import com.example.myapplication.data.entities.RouteRoom
 import com.example.myapplication.data.dto.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,14 +12,14 @@ class DataMediator(private val dao: RoutesDao){
 
     @Volatile
     private var databaseInit = false
-    private var databaseRoutes: List<Route> = listOf()
+    private var databaseRoutes: List<RouteCommon> = listOf()
 
     private val mediatorScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     fun initializeDataBase() {
         mediatorScope.launch {
             try{
                 val result = dao.getAllRoutes()
-                databaseRoutes = result
+                databaseRoutes = result.map { entity -> routeRoomEntityToCommon(entity) }
                 databaseInit = true
             } catch (e: Exception) {
                 databaseInit = false
@@ -27,23 +27,34 @@ class DataMediator(private val dao: RoutesDao){
         }
     }
 
-    val allRoutes: List<Route>
+    val allRouteCommons: List<RouteCommon>
         get() = if (databaseInit && databaseRoutes.isNotEmpty()) databaseRoutes else staticRoutes
 
-    fun getRoutesByType(type: String): List<Route> {
-        return allRoutes.filter { it.type == type }
+    fun getRoutesByType(type: String): List<RouteCommon> {
+        return allRouteCommons.filter { it.type == type }
     }
 
-    fun getRouteById(id: Long): Route? {
-        return allRoutes.find { it.id == id }
+    fun getRouteById(id: String): RouteCommon? {
+        return allRouteCommons.find { it.id == id }
     }
 
     fun getRoutesCategories(): List<String> {
-        return allRoutes.map { it.type }.distinct().sorted()
+        return allRouteCommons.map { it.type }.distinct().sorted()
     }
 
-    fun dtoToRoomEntity(response: WarszawaApiResponseDto): List<Route> {
-        val routeList = mutableListOf<Route>()
+    fun routeRoomEntityToCommon(entity: RouteRoom): RouteCommon{
+        return RouteCommon(
+            entity.id.toString(),
+            name = entity.name,
+            type = entity.type,
+            length = entity.length,
+            difficulty = entity.difficulty,
+            additionalInfo = entity.additionalInfo
+        )
+    }
+
+    fun routeDtoToRoomEntity(response: WarszawaApiResponseDto): List<RouteRoom> {
+        val routeList = mutableListOf<RouteRoom>()
 
         for (dto in response.result) {
             val numericLength = dto.length.toDoubleOrNull() ?: 0.0
@@ -55,7 +66,7 @@ class DataMediator(private val dao: RoutesDao){
                 else -> "High"
             }
 
-            val roomEntity = Route(
+            val roomEntity = RouteRoom(
                 id = 0,
                 name = dto.title,
                 type = "tourist",

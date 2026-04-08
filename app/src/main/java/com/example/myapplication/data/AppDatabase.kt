@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.*
 import com.example.myapplication.data.entities.*
 
-@Database(entities = [Route::class, RouteType::class], version = 1)
+@Database(entities = [RouteRoom::class, RouteTypeRoom::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getRoutesDao(): RoutesDao
 

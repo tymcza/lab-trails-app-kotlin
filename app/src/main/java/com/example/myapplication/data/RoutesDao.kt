@@ -6,25 +6,25 @@ import com.example.myapplication.data.entities.*
 @Dao
 interface RoutesDao {
     @Query("SELECT * FROM routes_catalogue")
-    suspend fun getAllRoutes(): List<Route>
+    suspend fun getAllRoutes(): List<RouteRoom>
 
     @Query("SELECT * FROM routes_catalogue WHERE type = :routeType")
-    suspend fun getRoutesByType(routeType: String): List<Route>
+    suspend fun getRoutesByType(routeType: String): List<RouteRoom>
 
     @Query("SELECT * FROM routes_catalogue WHERE ID = :routeID")
-    suspend fun getRouteByID(routeID: String): Route?
+    suspend fun getRouteByID(routeID: String): RouteRoom?
 
     @Query("SELECT type_name FROM route_types ORDER BY type_name ASC")
     suspend fun getRoutesCategories(): List<String>
 
     @Insert
-    suspend fun insertRoute(route: Route)
+    suspend fun insertRoute(routeRoom: RouteRoom)
     @Insert
-    suspend fun insertRouteType(routeType: RouteType)
+    suspend fun insertRouteType(routeTypeRoom: RouteTypeRoom)
 
     @Update
-    suspend fun updateRoute(route: Route)
+    suspend fun updateRoute(routeRoom: RouteRoom)
 
     @Delete
-    suspend fun deleteRoute(route:Route)
+    suspend fun deleteRoute(routeRoom:RouteRoom)
 }
