@@ -33,7 +33,7 @@ class DataMediator(private val dao: RoutesDao){
         return allRoutes.filter { it.type == type }
     }
 
-    fun getRouteById(id: String): Route? {
+    fun getRouteById(id: Long): Route? {
         return allRoutes.find { it.id == id }
     }
 

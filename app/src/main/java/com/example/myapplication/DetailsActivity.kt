@@ -31,7 +31,7 @@ class DetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val routeID = intent.getStringExtra("routeID") ?: "IDNotProvided"
+        val routeID = intent.getLongExtra("routeID", -1)
         val mediator = (application as MyApp).dataMediator
         val viewModel: DetailsViewModel by viewModels { DetailsViewModelFactory(mediator, routeID) }
 
