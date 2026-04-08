@@ -4,7 +4,7 @@ import androidx.room.*
 
 @Entity(tableName = "routes_catalogue")
 data class Route(
-    @PrimaryKey val id: String,
+    @PrimaryKey (autoGenerate = true) val id: Long = 0,
     val name: String,
     val type: String,
     val length: String,
