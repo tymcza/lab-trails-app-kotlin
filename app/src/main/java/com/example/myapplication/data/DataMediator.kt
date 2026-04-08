@@ -2,6 +2,7 @@ package com.example.myapplication.data
 
 import com.example.myapplication.data.RouteRepository.staticRoutes
 import com.example.myapplication.data.entities.Route
+import com.example.myapplication.data.dto.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,4 +41,32 @@ class DataMediator(private val dao: RoutesDao){
     fun getRoutesCategories(): List<String> {
         return allRoutes.map { it.type }.distinct().sorted()
     }
+
+    fun dtoToRoomEntity(response: WarszawaApiResponseDto): List<Route> {
+        val routeList = mutableListOf<Route>()
+
+        for (dto in response.result) {
+            val numericLength = dto.length.toDoubleOrNull() ?: 0.0
+
+            val difficultyLabel = when {
+                numericLength <= 0.0 -> "No data"
+                numericLength < 6.0 -> "Low"
+                numericLength < 15.0 -> "Intermediate"
+                else -> "High"
+            }
+
+            val roomEntity = Route(
+                id = 0,
+                name = dto.title,
+                type = "tourist",
+                length = dto.length,
+                difficulty = difficultyLabel,
+                additionalInfo = dto.description
+            )
+
+            routeList.add(roomEntity)
+        }
+        return routeList
+    }
+
 }
