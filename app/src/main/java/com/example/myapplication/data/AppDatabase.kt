@@ -3,7 +3,8 @@ package com.example.myapplication.data
 import android.content.Context
 import androidx.room.Database
 import androidx.room.*
-import com.example.myapplication.data.entities.*
+import com.example.myapplication.data.types.entities.RouteRoom
+import com.example.myapplication.data.types.entities.RouteTypeRoom
 
 @Database(entities = [RouteRoom::class, RouteTypeRoom::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {

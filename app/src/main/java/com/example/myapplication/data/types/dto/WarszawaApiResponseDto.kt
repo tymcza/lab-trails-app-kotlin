@@ -1,4 +1,4 @@
-package com.example.myapplication.data.dto
+package com.example.myapplication.data.types.dto
 
 data class WarszawaApiResponseDto(
     val result: List<WarszawaApiRouteDto>

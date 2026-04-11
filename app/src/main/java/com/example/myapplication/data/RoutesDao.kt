@@ -1,7 +1,8 @@
 package com.example.myapplication.data
 
 import androidx.room.*
-import com.example.myapplication.data.entities.*
+import com.example.myapplication.data.types.entities.RouteRoom
+import com.example.myapplication.data.types.entities.RouteTypeRoom
 
 @Dao
 interface RoutesDao {
@@ -26,5 +27,5 @@ interface RoutesDao {
     suspend fun updateRoute(routeRoom: RouteRoom)
 
     @Delete
-    suspend fun deleteRoute(routeRoom:RouteRoom)
+    suspend fun deleteRoute(routeRoom: RouteRoom)
 }

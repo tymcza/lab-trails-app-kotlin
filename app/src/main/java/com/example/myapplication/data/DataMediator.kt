@@ -1,8 +1,9 @@
 package com.example.myapplication.data
 
 import com.example.myapplication.data.RouteRepository.staticRoutes
-import com.example.myapplication.data.entities.RouteRoom
-import com.example.myapplication.data.dto.*
+import com.example.myapplication.data.types.entities.RouteRoom
+import com.example.myapplication.data.types.RouteCommon
+import com.example.myapplication.data.types.dto.WarszawaApiResponseDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -42,7 +43,7 @@ class DataMediator(private val dao: RoutesDao){
         return allRouteCommons.map { it.type }.distinct().sorted()
     }
 
-    fun routeRoomEntityToCommon(entity: RouteRoom): RouteCommon{
+    fun routeRoomEntityToCommon(entity: RouteRoom): RouteCommon {
         return RouteCommon(
             entity.id.toString(),
             name = entity.name,

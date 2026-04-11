@@ -1,4 +1,4 @@
-package com.example.myapplication.data.dto
+package com.example.myapplication.data.types.dto
 
 data class WarszawaApiRouteDto(
     val length: String,

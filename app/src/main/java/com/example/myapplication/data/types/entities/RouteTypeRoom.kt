@@ -1,4 +1,4 @@
-package com.example.myapplication.data.entities
+package com.example.myapplication.data.types.entities
 
 import androidx.room.*
 

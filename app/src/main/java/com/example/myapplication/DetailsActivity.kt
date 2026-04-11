@@ -22,7 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.RouteCommon
+import com.example.myapplication.data.types.RouteCommon
 import com.example.myapplication.logic.DetailsViewModel
 import com.example.myapplication.logic.DetailsViewModelFactory
 
