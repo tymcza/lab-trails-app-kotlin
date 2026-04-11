@@ -1,8 +1,10 @@
-package com.example.myapplication.data
+package com.example.myapplication.data.room
 
 import android.content.Context
 import androidx.room.Database
-import androidx.room.*
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.example.myapplication.data.room.RoutesDao
 import com.example.myapplication.data.types.entities.RouteRoom
 import com.example.myapplication.data.types.entities.RouteTypeRoom
 

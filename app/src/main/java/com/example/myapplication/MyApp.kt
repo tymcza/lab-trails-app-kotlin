@@ -1,7 +1,7 @@
 package com.example.myapplication
 
 import android.app.Application
-import com.example.myapplication.data.AppDatabase
+import com.example.myapplication.data.room.AppDatabase
 import com.example.myapplication.data.DataMediator
 
 class MyApp : Application() {
