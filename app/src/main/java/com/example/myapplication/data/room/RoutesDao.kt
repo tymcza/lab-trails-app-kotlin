@@ -23,6 +23,8 @@ interface RoutesDao {
     suspend fun getRoutesCategories(): List<String>
 
     @Insert
+    suspend fun insertAllRoutes(routesList: List<RouteRoom>)
+    @Insert
     suspend fun insertRoute(routeRoom: RouteRoom)
     @Insert
     suspend fun insertRouteType(routeTypeRoom: RouteTypeRoom)
