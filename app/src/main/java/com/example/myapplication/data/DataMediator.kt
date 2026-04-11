@@ -43,19 +43,19 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
         }
     }
 
-    val allRouteCommons: List<RouteCommon>
+    val allRoutesCommon: List<RouteCommon>
         get() = if (databaseInit && databaseRoutes.isNotEmpty()) databaseRoutes else staticRoutes
 
     fun getRoutesByType(type: String): List<RouteCommon> {
-        return allRouteCommons.filter { it.type == type }
+        return allRoutesCommon.filter { it.type == type }
     }
 
     fun getRouteById(id: String): RouteCommon? {
-        return allRouteCommons.find { it.id == id }
+        return allRoutesCommon.find { it.id == id }
     }
 
     fun getRoutesCategories(): List<String> {
-        return allRouteCommons.map { it.type }.distinct().sorted()
+        return allRoutesCommon.map { it.type }.distinct().sorted()
     }
 
     fun routeRoomEntityToCommon(entity: RouteRoom): RouteCommon {
