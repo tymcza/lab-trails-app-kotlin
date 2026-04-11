@@ -1,6 +1,8 @@
 package com.example.myapplication.data
 
+import com.example.myapplication.Secrets
 import com.example.myapplication.data.RouteRepository.staticRoutes
+import com.example.myapplication.data.retrofit.WarsawApiService
 import com.example.myapplication.data.room.RoutesDao
 import com.example.myapplication.data.types.entities.RouteRoom
 import com.example.myapplication.data.types.RouteCommon
@@ -10,22 +12,34 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class DataMediator(private val dao: RoutesDao){
+class DataMediator(private val dao: RoutesDao, private val warsawApiService: WarsawApiService){
 
     @Volatile
     private var databaseInit = false
     private var databaseRoutes: List<RouteCommon> = listOf()
 
     private val mediatorScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    fun initializeDataBase() {
+    suspend fun loadFromDataBase() {
+        try{
+            val result = dao.getAllRoutes()
+            databaseRoutes = result.map { entity -> routeRoomEntityToCommon(entity) }
+            databaseInit = true
+        } catch (e: Exception) {
+            databaseInit = false
+            e.printStackTrace()
+        }
+    }
+
+    fun fetchApiRefreshDb() {
         mediatorScope.launch {
-            try{
-                val result = dao.getAllRoutes()
-                databaseRoutes = result.map { entity -> routeRoomEntityToCommon(entity) }
-                databaseInit = true
+            try {
+                val warsawApiResponseDto = warsawApiService.getTouristRoutes(apiKey = Secrets.API_KEY)
+                val roomEntities = routeDtoToRoomEntity(warsawApiResponseDto)
+                dao.insertAllRoutes(roomEntities)
             } catch (e: Exception) {
-                databaseInit = false
+                e.printStackTrace()
             }
+            loadFromDataBase()
         }
     }
 
