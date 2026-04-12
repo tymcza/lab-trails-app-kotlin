@@ -6,23 +6,21 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.myapplication.data.room.RouteRoom
 
 @Dao
 interface RoutesDao {
     @Query("SELECT * FROM routes ORDER BY name ASC")
     suspend fun getAllRoutes(): List<RouteRoom>
 
-    @Query("SELECT * FROM routes WHERE type = :routeType ORDER BY name ASC")
-    suspend fun getRoutesByType(routeType: String): List<RouteRoom>
-
-    @Query("SELECT * FROM routes WHERE ID = :routeID")
-    suspend fun getRouteByID(routeID: String): RouteRoom?
+    @Query("SELECT * FROM records WHERE correspondingRouteId = :routeId")
+    suspend fun getRecordByRouteId(routeId: String): List<RecordRoom>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllRoutes(routesList: List<RouteRoom>)
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertRoute(routeRoom: RouteRoom)
+    @Insert
+    suspend fun insertRecord(recordRoom: RecordRoom)
 
     @Update
     suspend fun updateRoute(routeRoom: RouteRoom)
