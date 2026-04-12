@@ -1,5 +1,6 @@
 package com.example.myapplication.data
 
+import android.util.Log
 import com.example.myapplication.Secrets
 import com.example.myapplication.data.RouteRepository.staticRoutes
 import com.example.myapplication.data.retrofit.WarsawApiService
@@ -19,14 +20,14 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
     private var databaseRoutes: List<RouteCommon> = listOf()
 
     private val mediatorScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    suspend fun loadFromDataBase() {
+    suspend fun refreshDataBase() {
         try{
             val result = dao.getAllRoutes()
             databaseRoutes = result.map { entity -> routeRoomEntityToCommon(entity) }
             databaseInit = true
         } catch (e: Exception) {
             databaseInit = false
-            e.printStackTrace()
+            Log.e("MY_ERROR", "Error in DataMediator, loadFromDataBase(): ${e.toString()}")
         }
     }
 
@@ -36,10 +37,11 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
                 val warsawApiResponseDto = warsawApiService.getTouristRoutes(apiKey = Secrets.API_KEY)
                 val roomEntities = routeDtoToRoomEntity(warsawApiResponseDto)
                 dao.insertAllRoutes(roomEntities)
+                Log.d("MY_LOG", "Data fetched from Warsaw API successfully loaded to ROOM database")
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("MY_ERROR", "Error in DataMediator, fetchApiRefreshDb(): ${e.toString()}")
             }
-            loadFromDataBase()
+            refreshDataBase()
         }
     }
 
@@ -95,5 +97,4 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
         }
         return routeList
     }
-
 }
