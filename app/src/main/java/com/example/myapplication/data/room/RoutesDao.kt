@@ -9,13 +9,13 @@ import com.example.myapplication.data.types.entities.RouteRoom
 
 @Dao
 interface RoutesDao {
-    @Query("SELECT * FROM routes_catalogue")
+    @Query("SELECT * FROM routes")
     suspend fun getAllRoutes(): List<RouteRoom>
 
-    @Query("SELECT * FROM routes_catalogue WHERE type = :routeType")
+    @Query("SELECT * FROM routes WHERE type = :routeType")
     suspend fun getRoutesByType(routeType: String): List<RouteRoom>
 
-    @Query("SELECT * FROM routes_catalogue WHERE ID = :routeID")
+    @Query("SELECT * FROM routes WHERE ID = :routeID")
     suspend fun getRouteByID(routeID: String): RouteRoom?
 
     @Insert
