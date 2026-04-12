@@ -13,7 +13,7 @@ class MyApp : Application() {
         AppDatabase.getInstance(this)
     }
 
-    private val retrofit: Retrofit by lazy {
+    private val warsawApiRetrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl("https://api.um.warszawa.pl/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -21,7 +21,7 @@ class MyApp : Application() {
     }
 
     private val warsawApiService by lazy {
-        retrofit.create(WarsawApiService::class.java)
+        warsawApiRetrofit.create(WarsawApiService::class.java)
     }
 
     val dataMediator by lazy {
