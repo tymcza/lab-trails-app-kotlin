@@ -1,6 +1,5 @@
 package com.example.myapplication.data.retrofit
 
-import com.example.myapplication.data.types.dto.WarsawApiResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Query
 

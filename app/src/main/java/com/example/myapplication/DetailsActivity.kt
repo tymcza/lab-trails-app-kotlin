@@ -22,9 +22,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.types.RouteCommon
-import com.example.myapplication.logic.DetailsViewModel
-import com.example.myapplication.logic.DetailsViewModelFactory
+import com.example.myapplication.data.RouteCommon
+import com.example.myapplication.viewmodels.DetailsViewModel
+import com.example.myapplication.viewmodels.DetailsViewModelFactory
 
 class DetailsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)

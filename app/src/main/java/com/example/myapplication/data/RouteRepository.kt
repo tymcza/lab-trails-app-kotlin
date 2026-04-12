@@ -1,6 +1,6 @@
 package com.example.myapplication.data
 
-import com.example.myapplication.data.types.RouteCommon
+import com.example.myapplication.data.RouteCommon
 
 object RouteRepository {
     val staticRoutes = listOf(

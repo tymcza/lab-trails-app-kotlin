@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.myapplication.data.types.entities.RouteRoom
+import com.example.myapplication.data.room.RouteRoom
 
 @Database(entities = [RouteRoom::class], version = 3)
 abstract class AppDatabase : RoomDatabase() {

@@ -5,9 +5,9 @@ import com.example.myapplication.Secrets
 import com.example.myapplication.data.RouteRepository.staticRoutes
 import com.example.myapplication.data.retrofit.WarsawApiService
 import com.example.myapplication.data.room.RoutesDao
-import com.example.myapplication.data.types.entities.RouteRoom
-import com.example.myapplication.data.types.RouteCommon
-import com.example.myapplication.data.types.dto.WarsawApiResponseDto
+import com.example.myapplication.data.room.RouteRoom
+import com.example.myapplication.data.RouteCommon
+import com.example.myapplication.data.retrofit.WarsawApiResponseDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

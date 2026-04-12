@@ -1,4 +1,4 @@
-package com.example.myapplication.data.types.dto
+package com.example.myapplication.data.retrofit
 
 data class WarsawApiRouteDto(
     val length: String,

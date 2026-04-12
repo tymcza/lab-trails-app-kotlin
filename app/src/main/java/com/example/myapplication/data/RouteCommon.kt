@@ -1,4 +1,4 @@
-package com.example.myapplication.data.types
+package com.example.myapplication.data
 
 data class RouteCommon(
     val id: String,
