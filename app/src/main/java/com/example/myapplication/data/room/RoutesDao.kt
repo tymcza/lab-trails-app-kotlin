@@ -3,6 +3,7 @@ package com.example.myapplication.data.room
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.myapplication.data.types.entities.RouteRoom
@@ -18,9 +19,9 @@ interface RoutesDao {
     @Query("SELECT * FROM routes WHERE ID = :routeID")
     suspend fun getRouteByID(routeID: String): RouteRoom?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllRoutes(routesList: List<RouteRoom>)
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRoute(routeRoom: RouteRoom)
 
     @Update
