@@ -22,7 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.entities.Route
+import com.example.myapplication.data.types.RouteCommon
 import com.example.myapplication.logic.DetailsViewModel
 import com.example.myapplication.logic.DetailsViewModelFactory
 
@@ -31,13 +31,13 @@ class DetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val routeID = intent.getStringExtra("routeID") ?: "IDNotProvided"
+        val routeID = intent.getStringExtra("routeID") ?: "No ID provided"
         val mediator = (application as MyApp).dataMediator
         val viewModel: DetailsViewModel by viewModels { DetailsViewModelFactory(mediator, routeID) }
 
         enableEdgeToEdge()
         setContent {
-            val route: Route? = viewModel.route.value
+            val route: RouteCommon? = viewModel.route.value
 
             if (route == null) {
                 RouteNotFoundScreen(onBack = { finish() })
@@ -50,7 +50,7 @@ class DetailsActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RouteDetailsScreen(route: Route, onBack: () -> Unit) {
+fun RouteDetailsScreen(route: RouteCommon, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,7 +93,7 @@ fun RouteNotFoundScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Oops! Route not found.")
+            Text("Oops! RouteRoom not found.")
             Button(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) {
                 Text("Go Back")
             }
