@@ -55,7 +55,7 @@ abstract class AppDatabase : RoomDatabase() {
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                 `correspondingRouteId` INTEGER NOT NULL, 
                 `registeredTimeSeconds` INTEGER NOT NULL, 
-                `dateTimestamp` INTEGER NOT NULL, 
+                `date` INTEGER NOT NULL, 
                 FOREIGN KEY(`correspondingRouteId`) REFERENCES `routes`(`id`) ON UPDATE CASCADE ON DELETE CASCADE 
             )
         """.trimIndent())

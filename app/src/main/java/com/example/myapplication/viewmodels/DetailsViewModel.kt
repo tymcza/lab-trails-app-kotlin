@@ -3,13 +3,121 @@ package com.example.myapplication.viewmodels
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.DataMediator
+import com.example.myapplication.data.RecordCommon
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 
 class DetailsViewModel(private val mediator: DataMediator, private val routeID: String) : ViewModel() {
+
     val route = mutableStateOf(mediator.getRouteById(routeID))
+    private val _bestTimeRecord = MutableStateFlow<RecordCommon?>(null)
+
+    val bestDateFormatted: StateFlow<String?> = _bestTimeRecord.map { record ->
+        record?.let {
+            java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                .format(java.util.Date(it.date*1000))
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val bestTimeFormatted: StateFlow<String?> = _bestTimeRecord.map { record ->
+        record?.let { formatSeconds(it.registeredTimeSeconds) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+
+    init {
+        refresh()
+    }
 
     fun refresh() {
-        route.value = mediator.getRouteById(routeID)
+        viewModelScope.launch {
+            route.value = mediator.getRouteById(routeID)
+            _bestTimeRecord.value = mediator.getBestRecordById(routeID).firstOrNull()
+        }
+    }
+
+    private val _timerState = MutableStateFlow("init")
+    val timerState: StateFlow<String> = _timerState.asStateFlow()
+    private var timerJob: Job? = null
+    var totalSeconds: Long = 0
+    private val _timerDisplay = MutableStateFlow("00:00:00")
+    val timerDisplay: StateFlow<String> = _timerDisplay.asStateFlow()
+
+    fun startTimer() {
+        _timerState.value = "play"
+        if (timerJob?.isActive == true) return
+
+        timerJob = viewModelScope.launch {
+            while (_timerState.value == "play") {
+                delay(1000) // Wait for 1 second
+                if (_timerState.value != "play") {
+                    break
+                }
+                totalSeconds++
+
+                val hours = totalSeconds / 3600
+                val minutes = (totalSeconds % 3600) / 60
+                val seconds = totalSeconds % 60
+
+                _timerDisplay.value = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            }
+        }
+    }
+
+    fun pauseTimer() {
+        _timerState.value = "pause"
+    }
+
+    fun deleteTimer() {
+        _timerState.value = "init"
+        timerJob = null
+        totalSeconds = 0
+        _timerDisplay.value = "00:00:00"
+    }
+
+    fun saveTimer() {
+        _timerState.value = "init"
+        timerJob = null
+
+        val todayMidnightSeconds = LocalDate.now()
+            .atStartOfDay(ZoneId.systemDefault())
+            .toEpochSecond()
+        val record = RecordCommon(
+            id = "0",
+            correspondingRouteId = routeID,
+            registeredTimeSeconds = totalSeconds,
+            date = todayMidnightSeconds
+        )
+
+        totalSeconds = 0
+        _timerDisplay.value = "00:00:00"
+
+        viewModelScope.launch {
+            mediator.saveRecord(record)
+            refresh()
+        }
+    }
+
+    private fun formatSeconds(totalSeconds: Long): String {
+        val h = totalSeconds / 3600
+        val m = (totalSeconds % 3600) / 60
+        val s = totalSeconds % 60
+
+        return buildString {
+            if (h > 0) append("${h}h ")
+            if (m > 0 || h > 0) append("${m}m ") // Shows 0m if there are hours (e.g., 1h 0m 5s)
+            append("${s}s")
+        }.trim()
     }
 }
 
