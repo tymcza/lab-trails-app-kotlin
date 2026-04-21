@@ -6,9 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.myapplication.data.types.entities.RouteRoom
 
-@Database(entities = [RouteRoom::class], version = 3)
+@Database(entities = [RouteRoom::class, RecordRoom::class], version = 4)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getRoutesDao(): RoutesDao
 
@@ -23,7 +22,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "routes_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build().also {INSTANCE = it}
             }
         }
@@ -45,7 +44,22 @@ abstract class AppDatabase : RoomDatabase() {
                 GROUP BY `name`
             )
         """.trimIndent())
-                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_routes_name` ON `routes` (`name`)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_routes_name` ON `routes`(`name`)")
+            }
+        }
+
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+            CREATE TABLE IF NOT EXISTS `records` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                `correspondingRouteId` INTEGER NOT NULL, 
+                `registeredTimeSeconds` INTEGER NOT NULL, 
+                `date` INTEGER NOT NULL, 
+                FOREIGN KEY(`correspondingRouteId`) REFERENCES `routes`(`id`) ON UPDATE CASCADE ON DELETE CASCADE 
+            )
+        """.trimIndent())
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_records_correspondingRouteId` ON `records`(`correspondingRouteId`)")
             }
         }
     }

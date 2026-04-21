@@ -31,8 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.data.DataMediator
-import com.example.myapplication.logic.MainViewModel
-import com.example.myapplication.logic.MainViewModelFactory
+import com.example.myapplication.viewmodels.MainViewModel
+import com.example.myapplication.viewmodels.MainViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {

@@ -5,9 +5,9 @@ import com.example.myapplication.Secrets
 import com.example.myapplication.data.RouteRepository.staticRoutes
 import com.example.myapplication.data.retrofit.WarsawApiService
 import com.example.myapplication.data.room.RoutesDao
-import com.example.myapplication.data.types.entities.RouteRoom
-import com.example.myapplication.data.types.RouteCommon
-import com.example.myapplication.data.types.dto.WarsawApiResponseDto
+import com.example.myapplication.data.room.RouteRoom
+import com.example.myapplication.data.retrofit.WarsawApiResponseDto
+import com.example.myapplication.data.room.RecordRoom
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -47,6 +47,41 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
 
     val allRoutesCommon: List<RouteCommon>
         get() = if (databaseInit && databaseRoutes.isNotEmpty()) databaseRoutes else staticRoutes
+
+    suspend fun getBestRecordById(routeID: String): List<RecordCommon> {
+        var record: List<RecordRoom> = emptyList()
+        try {
+            record = dao.getBestRecordByRouteId(routeID.toLong())
+        } catch (e: Exception) {
+            Log.e("MY_ERROR", "Error in DataMediator, getRecordById(${routeID}): ${e.toString()}")
+        }
+        return record.map { recordRoomToRecordCommon(it)}
+    }
+
+    fun recordRoomToRecordCommon(record: RecordRoom): RecordCommon {
+        val recordCommon = RecordCommon(
+            id = record.id.toString(),
+            correspondingRouteId = record.correspondingRouteId.toString(),
+            registeredTimeSeconds = record.registeredTimeSeconds,
+            date = record.date
+        )
+        return recordCommon
+    }
+
+    fun recordCommonToRecordRoom(record: RecordCommon): RecordRoom {
+        val recordRoom = RecordRoom(
+            id = record.id.toLong(),
+            correspondingRouteId = record.correspondingRouteId.toLong(),
+            registeredTimeSeconds = record.registeredTimeSeconds,
+            date = record.date
+        )
+        return recordRoom
+    }
+
+    suspend fun saveRecord(record: RecordCommon) {
+        val recordRoom = recordCommonToRecordRoom(record)
+        dao.insertRecord(recordRoom)
+    }
 
     fun getRoutesByType(type: String): List<RouteCommon> {
         return allRoutesCommon.filter { it.type == type }
