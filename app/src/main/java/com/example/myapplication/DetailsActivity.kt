@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +40,6 @@ import com.example.myapplication.data.RouteCommon
 import com.example.myapplication.viewmodels.DetailsViewModel
 import com.example.myapplication.viewmodels.DetailsViewModelFactory
 import androidx.compose.runtime.getValue
-import com.example.myapplication.data.RecordCommon
 
 class DetailsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -153,7 +153,6 @@ fun StopwatchControls(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // The zeroed display
         Text(
             text = currentTime,
             style = MaterialTheme.typography.displayMedium,
@@ -177,7 +176,7 @@ fun StopwatchControls(
                 modifier = Modifier.size(64.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
+                    imageVector = Icons.Default.Pause,
                     contentDescription = "Pause Timer",
                     modifier = Modifier.size(32.dp)
                 )
@@ -188,19 +187,17 @@ fun StopwatchControls(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Save Button
                 FilledIconButton(
                     onClick = { viewModel.saveTimer() },
                     modifier = Modifier.size(64.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Check, // Or Icons.Default.Replay
+                        imageVector = Icons.Default.Check,
                         contentDescription = "Save Your Time Record",
                         modifier = Modifier.size(32.dp)
                     )
                 }
 
-                // Resume Button
                 FilledIconButton(
                     onClick = { viewModel.startTimer() },
                     modifier = Modifier.size(64.dp)
@@ -212,13 +209,12 @@ fun StopwatchControls(
                     )
                 }
 
-                // Discard Button
                 FilledIconButton(
                     onClick = { viewModel.deleteTimer() },
                     modifier = Modifier.size(64.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Delete, // Or Icons.Default.Replay
+                        imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Your Time Record",
                         modifier = Modifier.size(32.dp)
                     )
