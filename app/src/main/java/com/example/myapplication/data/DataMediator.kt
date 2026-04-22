@@ -111,6 +111,21 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
         return routesCategories
     }
 
+    private val _routes = MutableStateFlow(staticRoutes)
+    val routes = _routes.asStateFlow()
+    fun fetchRoutesByType(category: String?): StateFlow<List<RouteCommon>> {
+        mediatorScope.launch {
+            try {
+                _routes.value = dao.getRoutesByType(category).map { route -> routeRoomEntityToCommon(route) }
+                Log.d("MY_LOG", "Routes categories successfully fetched from roomDB")
+            } catch (e: Exception) {
+                Log.e("MY_ERROR", "Error in DataMediator, fetchRoutesCategories: ${e.toString()}")
+            }
+
+        }
+        return routes
+    }
+
     fun routeRoomEntityToCommon(entity: RouteRoom): RouteCommon {
         return RouteCommon(
             entity.id.toString(),

@@ -12,6 +12,9 @@ interface RoutesDao {
     @Query("SELECT * FROM routes ORDER BY name ASC")
     suspend fun getAllRoutes(): List<RouteRoom>
 
+    @Query("SELECT * FROM routes WHERE type = :routeType ORDER BY name ASC")
+    suspend fun getRoutesByType(routeType: String?): List<RouteRoom>
+
     @Query("SELECT * FROM records WHERE correspondingRouteId = :routeId ORDER BY registeredTimeSeconds ASC LIMIT 1")
     suspend fun getBestRecordByRouteId(routeId: Long): List<RecordRoom>
 

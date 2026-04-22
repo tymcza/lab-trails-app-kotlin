@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -29,10 +30,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.data.DataMediator
+import com.example.myapplication.data.RouteCommon
 import com.example.myapplication.viewmodels.MainViewModel
 import com.example.myapplication.viewmodels.MainViewModelFactory
 
@@ -98,9 +108,48 @@ fun DisplayCategories(viewModel: MainViewModel, modifier: Modifier = Modifier){
 }
 
 @Composable
+fun RouteItem(route: RouteCommon, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick), // Makes the whole card interactable
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = route.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "${route.length} • ${route.difficulty}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+            )
+        }
+    }
+}
+
+@Composable
 fun DisplayNamesList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
-    val routesList = viewModel.displayedRoutesList.value
+    val routesList by viewModel.displayedRoutesList.collectAsState()
     val context = LocalContext.current
 
     LazyColumn(
@@ -110,19 +159,15 @@ fun DisplayNamesList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         ) {
         items(routesList){
             route ->
-            Button(
+            RouteItem(
+                route = route,
                 onClick = {
                     val intent = Intent(context, DetailsActivity::class.java).apply {
                         putExtra("routeID", route.id)
                     }
                     context.startActivity(intent)
-                },
-                colors = ButtonDefaults.buttonColors(Color.DarkGray)
-            ) {
-                Text(
-                    text = route.name
-                )
-            }
+                }
+            )
         }
     }
 }
