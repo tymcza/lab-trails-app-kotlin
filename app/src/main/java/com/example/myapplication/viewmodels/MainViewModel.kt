@@ -8,16 +8,15 @@ import com.example.myapplication.data.DataMediator
 
 class MainViewModel(private val mediator: DataMediator) : ViewModel() {
 
-    val categories = mediator.fetchRoutesCategories()
     var selectedCategory: MutableState<String?> = mutableStateOf(null)
         private set
-
-    //TODO: Update to Flow
-    val displayedRoutesList = mediator.fetchRoutesByType(selectedCategory.value)
+    val categories = mediator.getRoutesCategoriesFlow()
+    val displayedRoutesList = mediator.getRoutesByTypeFlow()
 
     fun updateCategory(category: String) {
         selectedCategory.value = category
         mediator.fetchRoutesByType(category)
+        mediator.fetchRoutesCategories()
     }
 }
 

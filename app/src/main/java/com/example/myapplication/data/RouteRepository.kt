@@ -50,4 +50,8 @@ object RouteRepository {
     fun getRouteTypes(): List<String> {
         return staticRoutes.map { it.type }.distinct()
     }
+
+    fun getRoutesByType(type: String): List<RouteCommon> {
+        return staticRoutes.filter { it.type == type }
+    }
 }

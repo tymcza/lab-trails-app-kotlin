@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
-import androidx.room.Upsert
 
 @Dao
 interface RoutesDao {
@@ -21,8 +21,26 @@ interface RoutesDao {
     @Query("SELECT DISTINCT type FROM routes")
     suspend fun getCategories(): List<String>
 
-    @Upsert
-    suspend fun insertAllRoutes(routesList: List<RouteRoom>)
+    @Query("SELECT id FROM routes WHERE name = :routeName")
+    suspend fun getRouteIdByName(routeName: String): Long?
+
+    @Query("SELECT * FROM routes WHERE id = :id")
+    suspend fun getRouteById(id: Long): RouteRoom?
+
+    @Transaction
+    suspend fun safeUpsert(route: RouteRoom) {
+        val existingId = getRouteIdByName(route.name)
+        if (existingId != null) {
+            updateRoute(route.copy(id = existingId))
+        } else {
+            insertRoute(route)
+        }
+    }
+
+    @Transaction
+    suspend fun safeUpsertAllRoutes(routes: List<RouteRoom>) {
+        routes.forEach { route -> safeUpsert(route) }
+    }
     @Insert
     suspend fun insertRoute(routeRoom: RouteRoom)
     @Insert
