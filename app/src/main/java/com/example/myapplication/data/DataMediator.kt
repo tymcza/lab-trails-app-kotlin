@@ -6,7 +6,6 @@ import com.example.myapplication.data.RouteRepository.staticRoutes
 import com.example.myapplication.data.retrofit.WarsawApiService
 import com.example.myapplication.data.room.RoutesDao
 import com.example.myapplication.data.room.RouteRoom
-import com.example.myapplication.data.retrofit.WarsawApiResponseDto
 import com.example.myapplication.data.room.RecordRoom
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +32,7 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
     suspend fun refreshDataBase() {
         try{
             val result = dao.getAllRoutes()
-            databaseRoutes = result.map { entity -> routeRoomEntityToCommon(entity) }
+            databaseRoutes = result.map { entity -> Mapper.routeRoomToCommon(entity) }
             databaseInit = true
         } catch (e: Exception) {
             databaseInit = false
@@ -43,7 +42,7 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
 
     suspend fun loadStaticToDatabase() {
         try {
-            dao.safeUpsertAllRoutes(staticRoutes.map { route -> routeCommonToRoomEntity(route)})
+            dao.safeUpsertAllRoutes(staticRoutes.map { route -> Mapper.routeCommonToRoom(route) })
             Log.d("MY_LOG", "Static routes data successfully loaded to ROOM database")
         } catch (e: Exception) {
             Log.e("MY_ERROR", "Error in DataMediator, loadStaticToDatabase(): ${e.toString()}")
@@ -54,7 +53,7 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
         mediatorScope.launch {
             try {
                 val warsawApiResponseDto = warsawApiService.getTouristRoutes(apiKey = Secrets.API_KEY)
-                val roomEntities = routeDtoToRoomEntity(warsawApiResponseDto)
+                val roomEntities = Mapper.routeDtoToRoom(warsawApiResponseDto)
                 dao.safeUpsertAllRoutes(roomEntities)
                 Log.d("MY_LOG", "Data fetched from Warsaw API successfully loaded to ROOM database")
             } catch (e: Exception) {
@@ -73,31 +72,11 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
         } catch (e: Exception) {
             Log.e("MY_ERROR", "Error in DataMediator, getRecordById(${routeID}): ${e.toString()}")
         }
-        return record.map { recordRoomToRecordCommon(it)}
-    }
-
-    fun recordRoomToRecordCommon(record: RecordRoom): RecordCommon {
-        val recordCommon = RecordCommon(
-            id = record.id.toString(),
-            correspondingRouteId = record.correspondingRouteId.toString(),
-            registeredTimeSeconds = record.registeredTimeSeconds,
-            date = record.date
-        )
-        return recordCommon
-    }
-
-    fun recordCommonToRecordRoom(record: RecordCommon): RecordRoom {
-        val recordRoom = RecordRoom(
-            id = record.id.toLong(),
-            correspondingRouteId = record.correspondingRouteId.toLong(),
-            registeredTimeSeconds = record.registeredTimeSeconds,
-            date = record.date
-        )
-        return recordRoom
+        return record.map { Mapper.recordRoomToCommon(it)}
     }
 
     suspend fun saveRecord(record: RecordCommon) {
-        val recordRoom = recordCommonToRecordRoom(record)
+        val recordRoom = Mapper.recordCommonToRoom(record)
         dao.insertRecord(recordRoom)
     }
 
@@ -107,7 +86,7 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
         mediatorScope.launch {
             try {
                 routeRoom = dao.getRouteById(id.toLong())
-                routeCommon = routeRoom?.let {routeRoomEntityToCommon(it)}
+                routeCommon = routeRoom?.let { Mapper.routeRoomToCommon(it) }
             } catch (e: Exception) {
                 Log.e("MY_ERR", "Error in data mediator getRouteById(${id}): ${e.toString()}")
             }
@@ -137,7 +116,7 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
     fun fetchRoutesByType(category: String) {
         mediatorScope.launch {
             try {
-                _routes.value = dao.getRoutesByType(category).map { route -> routeRoomEntityToCommon(route) }
+                _routes.value = dao.getRoutesByType(category).map { route -> Mapper.routeRoomToCommon(route) }
                 Log.d("MY_LOG", "Routes categories successfully fetched from roomDB")
             } catch (e: Exception) {
                 Log.e("MY_ERROR", "Error in DataMediator, fetchRoutesCategories: ${e.toString()}")
@@ -148,54 +127,5 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
 
     fun getRoutesByTypeFlow(): StateFlow<List<RouteCommon>> {
         return _routes.asStateFlow()
-    }
-
-    fun routeRoomEntityToCommon(entity: RouteRoom): RouteCommon {
-        return RouteCommon(
-            entity.id.toString(),
-            name = entity.name,
-            type = entity.type,
-            length = entity.length,
-            difficulty = entity.difficulty,
-            additionalInfo = entity.additionalInfo
-        )
-    }
-
-    fun routeCommonToRoomEntity(common: RouteCommon): RouteRoom {
-        return RouteRoom(
-            id = common.id.toLongOrNull() ?: 0L,
-            name = common.name,
-            type = common.type,
-            length = common.length,
-            difficulty = common.difficulty,
-            additionalInfo = common.additionalInfo
-        )
-    }
-
-    fun routeDtoToRoomEntity(response: WarsawApiResponseDto): List<RouteRoom> {
-        val routeList = mutableListOf<RouteRoom>()
-
-        for (dto in response.result) {
-            val numericLength = dto.length.toDoubleOrNull() ?: 0.0
-
-            val difficultyLabel = when {
-                numericLength <= 0.0 -> "No data"
-                numericLength < 6.0 -> "Low"
-                numericLength < 15.0 -> "Intermediate"
-                else -> "High"
-            }
-
-            val roomEntity = RouteRoom(
-                id = 0,
-                name = dto.title,
-                type = "Tourist",
-                length = dto.length,
-                difficulty = difficultyLabel,
-                additionalInfo = dto.description
-            )
-
-            routeList.add(roomEntity)
-        }
-        return routeList
     }
 }
