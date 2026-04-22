@@ -1,5 +1,8 @@
 package com.example.myapplication.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -20,9 +23,13 @@ import java.time.ZoneId
 
 class DetailsViewModel(private val mediator: DataMediator, private val routeID: String) : ViewModel() {
 
-    private val route = mediator.getRouteById(routeID)
-    fun getRoute(): RouteCommon? {
-        return route
+    var route by mutableStateOf<RouteCommon?>(null)
+        private set
+
+    init {
+        viewModelScope.launch {
+            route = mediator.getRouteById(routeID)
+        }
     }
 
     private val _bestTimeRecord = MutableStateFlow<RecordCommon?>(null)

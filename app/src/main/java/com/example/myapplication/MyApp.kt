@@ -9,6 +9,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MyApp : Application() {
 
+    override fun onCreate() {
+        super.onCreate()
+        dataMediator.initDB()
+    }
+
     private val database by lazy {
         AppDatabase.getInstance(this)
     }
@@ -28,9 +33,6 @@ class MyApp : Application() {
         DataMediator(
             database.getRoutesDao(),
             warsawApiService
-            ).apply {
-            fetchApiRefreshDb()
-        }
+            )
     }
-
 }

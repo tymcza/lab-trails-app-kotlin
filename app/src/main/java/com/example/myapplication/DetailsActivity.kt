@@ -51,7 +51,7 @@ class DetailsActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val route: RouteCommon? = viewModel.getRoute()
+            val route: RouteCommon? = viewModel.route
             val bestTime by viewModel.bestTimeFormatted.collectAsState()
             val bestDate by viewModel.bestDateFormatted.collectAsState()
 

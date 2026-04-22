@@ -4,19 +4,23 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.DataMediator
+import kotlinx.coroutines.launch
 
 class MainViewModel(private val mediator: DataMediator) : ViewModel() {
 
     var selectedCategory: MutableState<String?> = mutableStateOf(null)
         private set
     val categories = mediator.getRoutesCategoriesFlow()
-    val displayedRoutesList = mediator.getRoutesByTypeFlow()
+    val displayedRoutesList = mediator.getDisplayedRoutesFlow()
 
     fun updateCategory(category: String) {
         selectedCategory.value = category
-        mediator.fetchRoutesByType(category)
-        mediator.fetchRoutesCategories()
+        viewModelScope.launch {
+            mediator.updateDisplayedRoutes(category)
+            mediator.updateRoutesCategories()
+        }
     }
 }
 
