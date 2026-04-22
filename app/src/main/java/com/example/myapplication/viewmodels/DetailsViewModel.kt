@@ -1,11 +1,11 @@
 package com.example.myapplication.viewmodels
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.DataMediator
 import com.example.myapplication.data.RecordCommon
+import com.example.myapplication.data.RouteCommon
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,11 @@ import java.time.ZoneId
 
 class DetailsViewModel(private val mediator: DataMediator, private val routeID: String) : ViewModel() {
 
-    val route = mutableStateOf(mediator.getRouteById(routeID))
+    private val route = mediator.getRouteById(routeID)
+    fun getRoute(): RouteCommon? {
+        return route
+    }
+
     private val _bestTimeRecord = MutableStateFlow<RecordCommon?>(null)
 
     val bestDateFormatted: StateFlow<String?> = _bestTimeRecord.map { record ->
@@ -41,7 +45,6 @@ class DetailsViewModel(private val mediator: DataMediator, private val routeID: 
 
     fun refresh() {
         viewModelScope.launch {
-            route.value = mediator.getRouteById(routeID)
             _bestTimeRecord.value = mediator.getBestRecordById(routeID).firstOrNull()
         }
     }

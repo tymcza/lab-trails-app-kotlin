@@ -15,6 +15,9 @@ interface RoutesDao {
     @Query("SELECT * FROM records WHERE correspondingRouteId = :routeId ORDER BY registeredTimeSeconds ASC LIMIT 1")
     suspend fun getBestRecordByRouteId(routeId: Long): List<RecordRoom>
 
+    @Query("SELECT DISTINCT type FROM routes")
+    suspend fun getCategories(): List<String>
+
     @Upsert
     suspend fun insertAllRoutes(routesList: List<RouteRoom>)
     @Insert

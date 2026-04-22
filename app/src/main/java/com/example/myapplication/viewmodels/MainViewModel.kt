@@ -1,5 +1,6 @@
 package com.example.myapplication.viewmodels
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -7,18 +8,18 @@ import com.example.myapplication.data.DataMediator
 
 class MainViewModel(private val mediator: DataMediator) : ViewModel() {
 
-    val categories: List<String>
-        get() = mediator.getRoutesCategories()
-    var selectedCategory = mutableStateOf(categories.firstOrNull() ?: "Biker")
+    val categories = mediator.fetchRoutesCategories()
+    var selectedCategory: MutableState<String?> = mutableStateOf(null)
         private set
 
+    //TODO: Update to Flow
     var displayedRoutesList = mutableStateOf(mediator.getRoutesByType(selectedCategory.value))
         private set
 
 
     fun updateCategory(category: String) {
         selectedCategory.value = category
-        displayedRoutesList.value = mediator.getRoutesByType(selectedCategory.value)
+        displayedRoutesList.value = mediator.getRoutesByType(category)
     }
 }
 

@@ -29,6 +29,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.data.DataMediator
 import com.example.myapplication.viewmodels.MainViewModel
@@ -41,7 +43,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val mediator: DataMediator = (application as MyApp).dataMediator
-        //You have to add the dependency: implementation("androidx.activity:activity-ktx:1.x.x")
         val viewModel: MainViewModel by viewModels { MainViewModelFactory(mediator) }
 
         enableEdgeToEdge()
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DisplayCategories(viewModel: MainViewModel, modifier: Modifier = Modifier){
-    val categoriesList = viewModel.categories
+    val categoriesList by viewModel.categories.collectAsState()
     val selectedCategory = viewModel.selectedCategory.value
 
     Row(

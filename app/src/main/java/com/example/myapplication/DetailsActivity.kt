@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
@@ -52,7 +51,7 @@ class DetailsActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val route: RouteCommon? = viewModel.route.value
+            val route: RouteCommon? = viewModel.getRoute()
             val bestTime by viewModel.bestTimeFormatted.collectAsState()
             val bestDate by viewModel.bestDateFormatted.collectAsState()
 

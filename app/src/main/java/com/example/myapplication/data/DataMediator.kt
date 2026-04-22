@@ -11,7 +11,11 @@ import com.example.myapplication.data.room.RecordRoom
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Collections.emptyList
 
 class DataMediator(private val dao: RoutesDao, private val warsawApiService: WarsawApiService){
 
@@ -83,7 +87,7 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
         dao.insertRecord(recordRoom)
     }
 
-    fun getRoutesByType(type: String): List<RouteCommon> {
+    fun getRoutesByType(type: String?): List<RouteCommon> {
         return allRoutesCommon.filter { it.type == type }
     }
 
@@ -91,8 +95,20 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
         return allRoutesCommon.find { it.id == id }
     }
 
-    fun getRoutesCategories(): List<String> {
-        return allRoutesCommon.map { it.type }.distinct().sorted()
+    private val _routesCategories = MutableStateFlow(RouteRepository.getRouteTypes())
+    val routesCategories = _routesCategories.asStateFlow()
+
+    fun fetchRoutesCategories(): StateFlow<List<String>> {
+        mediatorScope.launch {
+            try {
+                _routesCategories.value = dao.getCategories()
+                Log.d("MY_LOG", "Routes categories successfully fetched from roomDB")
+            } catch (e: Exception) {
+                Log.e("MY_ERROR", "Error in DataMediator, fetchRoutesCategories: ${e.toString()}")
+            }
+
+        }
+        return routesCategories
     }
 
     fun routeRoomEntityToCommon(entity: RouteRoom): RouteCommon {
