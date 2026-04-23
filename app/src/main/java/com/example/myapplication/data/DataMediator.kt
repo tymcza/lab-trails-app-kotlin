@@ -4,7 +4,7 @@ import android.util.Log
 import com.example.myapplication.Secrets
 import com.example.myapplication.data.RouteRepository.staticRoutes
 import com.example.myapplication.data.retrofit.WarsawApiService
-import com.example.myapplication.data.room.RoutesDao
+import com.example.myapplication.data.room.RoomDao
 import com.example.myapplication.data.room.RouteRoom
 import com.example.myapplication.data.room.RecordRoom
 import kotlinx.coroutines.CoroutineScope
@@ -16,8 +16,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
 
-class DataMediator(private val dao: RoutesDao, private val warsawApiService: WarsawApiService){
+class DataMediator(private val dao: RoomDao, private val warsawApiService: WarsawApiService){
 
+    var isReady = false
+        private set
     private val _routes = MutableStateFlow(emptyList<RouteCommon>())
     private val _routesCategories = MutableStateFlow(RouteRepository.getRouteTypes())
 
@@ -32,6 +34,7 @@ class DataMediator(private val dao: RoutesDao, private val warsawApiService: War
             fetchApi()
             updateRoutesCategories()
         }
+        isReady = true
     }
     suspend fun loadStaticToDatabase() {
         try {

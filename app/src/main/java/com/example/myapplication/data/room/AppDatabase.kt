@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [RouteRoom::class, RecordRoom::class], version = 4)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun getRoutesDao(): RoutesDao
+    abstract fun getRoutesDao(): RoomDao
 
     companion object {
         @Volatile

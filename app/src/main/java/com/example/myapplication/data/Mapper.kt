@@ -69,7 +69,6 @@ object Mapper {
                 difficulty = difficultyLabel,
                 additionalInfo = dto.description
             )
-
             routeList.add(roomEntity)
         }
         return routeList

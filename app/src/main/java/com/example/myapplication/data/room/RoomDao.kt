@@ -8,7 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 
 @Dao
-interface RoutesDao {
+interface RoomDao {
     @Query("SELECT * FROM routes ORDER BY name ASC")
     suspend fun getAllRoutes(): List<RouteRoom>
 

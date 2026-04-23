@@ -1,7 +1,11 @@
 package com.example.myapplication
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -41,6 +45,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.animation.doOnEnd
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.myapplication.data.DataMediator
 import com.example.myapplication.data.RouteCommon
 import com.example.myapplication.viewmodels.MainViewModel
@@ -50,9 +56,46 @@ import com.example.myapplication.viewmodels.MainViewModelFactory
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val mediator: DataMediator = (application as MyApp).dataMediator
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !mediator.isReady }
+
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            val iconView = splashScreenView.iconView
+
+            // Animacja właściwości: Przesunięcie w górę (TranslationY) i zanikanie (Alpha)
+            // To symuluje "wyruszenie w trasę"
+            val slideUp = ObjectAnimator.ofFloat(
+                iconView,
+                View.TRANSLATION_Y,
+                0f,
+                -iconView.height.toFloat() * 2f
+            )
+
+            val fadeOut = ObjectAnimator.ofFloat(
+                iconView,
+                View.ALPHA,
+                1f,
+                0f
+            )
+
+            // Używamy AnimatorSet, aby połączyć te właściwości
+            AnimatorSet().apply {
+                playTogether(slideUp, fadeOut)
+                duration = 800L
+                interpolator = AnticipateInterpolator() // Efekt lekkiego cofnięcia przed startem
+
+                // Kluczowe: usunięcie widoku po zakończeniu animacji
+                doOnEnd {
+                    splashScreenView.remove()
+                }
+                start()
+            }
+        }
+
         super.onCreate(savedInstanceState)
 
-        val mediator: DataMediator = (application as MyApp).dataMediator
+
         val viewModel: MainViewModel by viewModels { MainViewModelFactory(mediator) }
 
         enableEdgeToEdge()
