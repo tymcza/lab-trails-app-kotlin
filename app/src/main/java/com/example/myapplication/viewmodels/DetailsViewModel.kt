@@ -1,5 +1,6 @@
 package com.example.myapplication.viewmodels
 
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -29,6 +30,7 @@ class DetailsViewModel(private val mediator: DataMediator, private val routeID: 
     init {
         viewModelScope.launch {
             route = mediator.getRouteById(routeID)
+            _bestTimeRecord.value = mediator.getBestRecordById(routeID).firstOrNull()
         }
     }
 
@@ -45,32 +47,27 @@ class DetailsViewModel(private val mediator: DataMediator, private val routeID: 
         record?.let { formatSeconds(it.registeredTimeSeconds) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-
-    init {
-        refresh()
-    }
-
     fun refresh() {
         viewModelScope.launch {
             _bestTimeRecord.value = mediator.getBestRecordById(routeID).firstOrNull()
         }
     }
 
-    private val _timerState = MutableStateFlow("init")
-    val timerState: StateFlow<String> = _timerState.asStateFlow()
+    private val _timerState = MutableStateFlow(TimerState.ZERO)
+    val timerState: StateFlow<TimerState> = _timerState.asStateFlow()
     private var timerJob: Job? = null
     var totalSeconds: Long = 0
     private val _timerDisplay = MutableStateFlow("00:00:00")
     val timerDisplay: StateFlow<String> = _timerDisplay.asStateFlow()
 
     fun startTimer() {
-        _timerState.value = "play"
+        _timerState.value = TimerState.PLAYING
         if (timerJob?.isActive == true) return
 
         timerJob = viewModelScope.launch {
-            while (_timerState.value == "play") {
-                delay(1000) // Wait for 1 second
-                if (_timerState.value != "play") {
+            while (_timerState.value == TimerState.PLAYING) {
+                delay(1000)
+                if (_timerState.value != TimerState.PLAYING) {
                     break
                 }
                 totalSeconds++
@@ -85,18 +82,18 @@ class DetailsViewModel(private val mediator: DataMediator, private val routeID: 
     }
 
     fun pauseTimer() {
-        _timerState.value = "pause"
+        _timerState.value = TimerState.PAUSE
     }
 
     fun deleteTimer() {
-        _timerState.value = "init"
+        _timerState.value = TimerState.ZERO
         timerJob = null
         totalSeconds = 0
         _timerDisplay.value = "00:00:00"
     }
 
     fun saveTimer() {
-        _timerState.value = "init"
+        _timerState.value = TimerState.ZERO
         timerJob = null
 
         val todayMidnightSeconds = LocalDate.now()
