@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
@@ -34,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -45,6 +47,7 @@ import com.example.myapplication.viewmodels.DetailsViewModelFactory
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.example.myapplication.viewmodels.TimerState
+import kotlinx.coroutines.delay
 
 class DetailsActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -118,10 +121,17 @@ fun RouteDetailsScreen(route: RouteCommon, bestTime: String?, bestDate: String?,
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouteNotFoundScreen(onBack: () -> Unit) {
+    var isGracePeriodOver by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(3000)
+        isGracePeriodOver = true
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Error") },
+                title = { Text(if (isGracePeriodOver) "Error" else "Loading...") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -130,16 +140,23 @@ fun RouteNotFoundScreen(onBack: () -> Unit) {
             )
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            contentAlignment = Alignment.Center
         ) {
-            Text("Oops! RouteRoom not found.")
-            Button(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) {
-                Text("Go Back")
+            if (isGracePeriodOver) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Oops! Route not found.")
+                    Button(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) {
+                        Text("Go Back")
+                    }
+                }
+            } else {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                )
             }
         }
     }
