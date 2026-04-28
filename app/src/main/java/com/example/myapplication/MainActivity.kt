@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -32,17 +33,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.animation.doOnEnd
@@ -63,8 +69,6 @@ class MainActivity : ComponentActivity() {
         splashScreen.setOnExitAnimationListener { splashScreenView ->
             val iconView = splashScreenView.iconView
 
-            // Animacja właściwości: Przesunięcie w górę (TranslationY) i zanikanie (Alpha)
-            // To symuluje "wyruszenie w trasę"
             val slideUp = ObjectAnimator.ofFloat(
                 iconView,
                 View.TRANSLATION_Y,
@@ -79,13 +83,11 @@ class MainActivity : ComponentActivity() {
                 0f
             )
 
-            // Używamy AnimatorSet, aby połączyć te właściwości
             AnimatorSet().apply {
                 playTogether(slideUp, fadeOut)
                 duration = 800L
-                interpolator = AnticipateInterpolator() // Efekt lekkiego cofnięcia przed startem
+                interpolator = AnticipateInterpolator()
 
-                // Kluczowe: usunięcie widoku po zakończeniu animacji
                 doOnEnd {
                     splashScreenView.remove()
                 }
@@ -100,17 +102,33 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            MyApplicationTheme {
+            val systemInDark = isSystemInDarkTheme()
+            var isDarkMode by remember { mutableStateOf(systemInDark) }
+
+            MyApplicationTheme(darkTheme = isDarkMode) {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            title = { Text("Routes list") }
+                            title = {
+                                Text(
+                                    text = "Routes list",
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                            },
+                            actions = {
+                                IconButton(onClick = { isDarkMode = !isDarkMode }) {
+                                    Icon(
+                                        imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                        contentDescription = "Toggle Theme"
+                                    )
+                                }
+                            }
                         )
                     }
                 ) { postScaffoldPadding ->
                     Column(Modifier.padding(postScaffoldPadding)) {
                         DisplayCategories(viewModel = viewModel, Modifier.fillMaxWidth().padding(4.dp))
-                        DisplayNamesList(viewModel)
+                        DisplayNamesList(viewModel, isDarkMode = isDarkMode)
                     }
                 }
             }
@@ -131,8 +149,8 @@ fun DisplayCategories(viewModel: MainViewModel, modifier: Modifier = Modifier){
             if (name == selectedCategory) {
                 OutlinedButton(
                     onClick = {},
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-                    border = BorderStroke(2.dp, Color.DarkGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.onPrimary)
                 ) {
                     Text(text = name)
                 }
@@ -141,9 +159,12 @@ fun DisplayCategories(viewModel: MainViewModel, modifier: Modifier = Modifier){
                     onClick = {
                         viewModel.updateCategory(name)
                               },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
                 ) {
-                    Text(text = name)
+                    Text(
+                        text = name,
+                        color = MaterialTheme.colorScheme.surface
+                        )
                 }
             }
         }
@@ -158,7 +179,7 @@ fun RouteItem(route: RouteCommon, onClick: () -> Unit) {
             .clickable(onClick = onClick), // Makes the whole card interactable
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.secondary
         )
     ) {
         Row(
@@ -172,25 +193,25 @@ fun RouteItem(route: RouteCommon, onClick: () -> Unit) {
                 Text(
                     text = route.name,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
                 Text(
                     text = "${route.length} • ${route.difficulty}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )
         }
     }
 }
 
 @Composable
-fun DisplayNamesList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+fun DisplayNamesList(viewModel: MainViewModel, modifier: Modifier = Modifier, isDarkMode: Boolean) {
 
     val routesList by viewModel.displayedRoutesList.collectAsState()
     val context = LocalContext.current
@@ -207,6 +228,7 @@ fun DisplayNamesList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 onClick = {
                     val intent = Intent(context, DetailsActivity::class.java).apply {
                         putExtra("routeID", route.id)
+                        putExtra("isDarkMode", isDarkMode)
                     }
                     context.startActivity(intent)
                 }

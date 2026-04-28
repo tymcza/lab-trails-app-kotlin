@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -32,8 +34,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -46,6 +49,7 @@ import com.example.myapplication.viewmodels.DetailsViewModel
 import com.example.myapplication.viewmodels.DetailsViewModelFactory
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.viewmodels.TimerState
 import kotlinx.coroutines.delay
 
@@ -55,19 +59,28 @@ class DetailsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val routeID = intent.getStringExtra("routeID") ?: "No ID provided"
+        val isDarkMode = intent.getBooleanExtra("isDarkMode", false)
         val mediator = (application as MyApp).dataMediator
         val viewModel: DetailsViewModel by viewModels { DetailsViewModelFactory(mediator, routeID) }
 
         enableEdgeToEdge()
         setContent {
-            val route: RouteCommon? = viewModel.route
-            val bestTime by viewModel.bestTimeFormatted.collectAsState()
-            val bestDate by viewModel.bestDateFormatted.collectAsState()
+            MyApplicationTheme (darkTheme = isDarkMode) {
+                val route: RouteCommon? = viewModel.route
+                val bestTime by viewModel.bestTimeFormatted.collectAsState()
+                val bestDate by viewModel.bestDateFormatted.collectAsState()
 
-            if (route == null) {
-                RouteNotFoundScreen(onBack = { finish() })
-            } else {
-                RouteDetailsScreen(route = route, bestTime = bestTime, bestDate = bestDate, onBack = { finish() }, viewModel)
+                if (route == null) {
+                    RouteNotFoundScreen(onBack = { finish() })
+                } else {
+                    RouteDetailsScreen(
+                        route = route,
+                        bestTime = bestTime,
+                        bestDate = bestDate,
+                        onBack = { finish() },
+                        viewModel
+                    )
+                }
             }
         }
     }
@@ -79,11 +92,19 @@ fun RouteDetailsScreen(route: RouteCommon, bestTime: String?, bestDate: String?,
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Details of ${route.name}") },
+                title = {
+                    Text(
+                        text = "Details of ${route.name}",
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
                     }
                 }
             )
@@ -170,26 +191,33 @@ fun StopwatchControls(
 ) {
     val currentTime by viewModel.timerDisplay.collectAsState()
     val timerState by viewModel.timerState.collectAsState()
-    var showDialog by remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
 
-    if (showDialog) {
+    if (showDialog.value) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Discard record") },
+            onDismissRequest = { showDialog.value = false },
+            title = { Text(
+                        text = "Discard record",
+                        color = MaterialTheme.colorScheme.onBackground
+                )
+                    },
             text = { Text("Are you sure you want to discard your time record?") },
             confirmButton = {
                 Button(
                     onClick = {
                         viewModel.deleteTimer()
-                        showDialog = false
-                    }
+                        showDialog.value = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text("Discard")
                 }
             },
             dismissButton = {
-                Button(
-                    onClick = { showDialog = false }
+                OutlinedButton(
+                    onClick = { showDialog.value = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
                 ) {
                     Text("Cancel")
                 }
@@ -211,36 +239,42 @@ fun StopwatchControls(
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    OutlinedIconButton(
-                        onClick = { showDialog = true },
+                    IconButton(
+                        onClick = { showDialog.value = true },
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .padding(start = 32.dp)
-                            .size(36.dp)
+                            .size(48.dp),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                            contentColor = MaterialTheme.colorScheme.onTertiary
+                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Discard",
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                            contentDescription = "Discard"
                         )
                     }
                     Text(
                         text = currentTime,
                         style = MaterialTheme.typography.displayMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     if (timerState == TimerState.PAUSE) {
-                        OutlinedIconButton(
+                        IconButton(
                             onClick = { viewModel.saveTimer() },
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
                                 .padding(end = 32.dp)
-                                .size(36.dp)
+                                .size(48.dp),
+                            colors = IconButtonDefaults.iconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary,
+                                contentColor = MaterialTheme.colorScheme.onTertiary
+                            )
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Check,
-                                contentDescription = "Save your time record",
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                contentDescription = "Save your time record"
                             )
                         }
                     }

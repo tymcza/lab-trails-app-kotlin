@@ -15,22 +15,28 @@
                 <path
                     android:name="path"
                     android:pathData="M 40 160 Q 100 160 100 100 Q 100 40 160 40"
-                    android:strokeColor="#00b894"
+                    android:fillColor="#000"
+                    android:fillAlpha="0"
+                    android:strokeColor="#fa7921"
                     android:strokeWidth="5"/>
                 <path
                     android:name="path_1"
                     android:pathData="M 150 125 C 146.023 125 142.205 126.581 139.393 129.393 C 136.581 132.205 135 136.023 135 140 C 135 143.977 136.581 147.795 139.393 150.607 C 142.205 153.419 146.023 155 150 155 C 153.977 155 157.795 153.419 160.607 150.607 C 163.419 147.795 165 143.977 165 140 C 165 136.023 163.419 132.205 160.607 129.393 C 157.795 126.581 153.977 125 150 125 Z M 110 125 C 106.023 125 102.205 126.581 99.393 129.393 C 96.581 132.205 95 136.023 95 140 C 95 143.977 96.581 147.795 99.393 150.607 C 102.205 153.419 106.023 155 110 155 C 113.977 155 117.795 153.419 120.607 150.607 C 123.419 147.795 125 143.977 125 140 C 125 136.023 123.419 132.205 120.607 129.393 C 117.795 126.581 113.977 125 110 125 Z"
-                    android:strokeColor="#0984e3"
+                    android:fillColor="#000"
+                    android:fillAlpha="0"
+                    android:strokeColor="#7bb2d9"
                     android:strokeWidth="5"/>
                 <path
                     android:name="path_2"
                     android:pathData="M 110 140 L 130 110 L 155 110"
-                    android:strokeColor="#0984e3"
+                    android:fillColor="#000"
+                    android:fillAlpha="0"
+                    android:strokeColor="#7bb2d9"
                     android:strokeWidth="5"/>
                 <path
                     android:name="path_3"
                     android:pathData="M 50 60 L 75 60 L 80 85 L 45 85 Z"
-                    android:fillColor="#636e72"
+                    android:fillColor="#453823"
                     android:strokeWidth="1"/>
             </group>
         </vector>
