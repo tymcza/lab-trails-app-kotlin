@@ -43,6 +43,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -110,9 +111,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val systemInDark = isSystemInDarkTheme()
-            var isDarkMode by remember { mutableStateOf(systemInDark) }
+            val isDarkMode = viewModel.isDarkMode
+            LaunchedEffect(Unit) {
+                viewModel.initialDarkMode(systemInDark)
+            }
             val context = LocalContext.current
-            
+
             val windowInfo = LocalWindowInfo.current
             val density = LocalDensity.current
             val isTablet = with(density) { windowInfo.containerSize.width.toDp() >= 600.dp }
@@ -132,7 +136,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                         },
                                         actions = {
-                                            IconButton(onClick = { isDarkMode = !isDarkMode }) {
+                                            IconButton(onClick = { viewModel.toggleDarkMode() }) {
                                                 Icon(
                                                     imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
                                                     contentDescription = "Toggle Theme"
@@ -202,7 +206,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 },
                                 actions = {
-                                    IconButton(onClick = { isDarkMode = !isDarkMode }) {
+                                    IconButton(onClick = { viewModel.toggleDarkMode() }) {
                                         Icon(
                                             imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
                                             contentDescription = "Toggle Theme"

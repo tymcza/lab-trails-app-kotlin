@@ -1,7 +1,9 @@
 package com.example.myapplication.viewmodels
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -10,6 +12,22 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(private val mediator: DataMediator) : ViewModel() {
 
+    var isDarkMode by mutableStateOf(false)
+        private set
+
+    private var isThemeInitialized = false
+
+    fun initialDarkMode(systemInDark: Boolean) {
+        if (!isThemeInitialized) {
+            isDarkMode = systemInDark
+            isThemeInitialized = true
+        }
+    }
+
+    fun toggleDarkMode() {
+        isDarkMode = !isDarkMode
+        isThemeInitialized = true
+    }
     var selectedCategory: MutableState<String?> = mutableStateOf(null)
         private set
     val categories = mediator.getRoutesCategoriesFlow()

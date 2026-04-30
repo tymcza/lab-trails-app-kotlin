@@ -80,6 +80,7 @@ class DataMediator(private val dao: RoomDao, private val warsawApiService: Warsa
         } catch (e: Exception) {
             Log.e("MY_ERR", "Error in data mediator getRouteById(${id}): ${e.toString()}")
         }
+        kotlinx.coroutines.delay(2000)
         return routeCommon
     }
 
